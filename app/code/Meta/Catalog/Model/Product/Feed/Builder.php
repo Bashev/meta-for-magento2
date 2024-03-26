@@ -424,8 +424,10 @@ class Builder
         if (!$description) {
             $description = $product->getShortDescription();
         }
+
+        // Fallback, if description is empty.
         if (!$description) {
-            return '';
+            return $product->getName();
         }
 
         // phpcs:ignore
