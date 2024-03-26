@@ -82,11 +82,11 @@ class Tools
     public function __construct(
         PriceCurrencyInterface $priceCurrency,
         ObjectManagerInterface $objectManager,
-        Escaper                $escaper,
-        SystemConfig           $systemConfig,
-        CatalogHelper          $catalogHelper,
-        ModuleManager          $moduleManager,
-        StoreManagerInterface  $storeManager
+        Escaper $escaper,
+        SystemConfig $systemConfig,
+        CatalogHelper $catalogHelper,
+        ModuleManager $moduleManager,
+        StoreManagerInterface $storeManager
     ) {
         $this->priceCurrency = $priceCurrency;
         $this->objectManager = $objectManager;
