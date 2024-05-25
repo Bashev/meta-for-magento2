@@ -82,12 +82,12 @@ class OrderItemMapper
      * @param OrderItemInterfaceFactory $orderItemFactory
      */
     public function __construct(
-        SystemConfig $systemConfig,
-        GraphAPIAdapter $graphAPIAdapter,
-        LoggerInterface $logger,
-        ProductIdentifier $productIdentifier,
-        ProductRepository $productRepository,
-        ConfigurableType $configurableType,
+        SystemConfig              $systemConfig,
+        GraphAPIAdapter           $graphAPIAdapter,
+        LoggerInterface           $logger,
+        ProductIdentifier         $productIdentifier,
+        ProductRepository         $productRepository,
+        ConfigurableType          $configurableType,
         OrderItemInterfaceFactory $orderItemFactory
     ) {
         $this->systemConfig = $systemConfig;
@@ -150,7 +150,9 @@ class OrderItemMapper
         // Dynamic Checkout:
         // set applied_rule_ids
 
-        /** @var OrderItem $orderItem */
+        /**
+         * @var OrderItem $orderItem
+         */
         $orderItem = $this->orderItemFactory->create();
 
         $orderItem

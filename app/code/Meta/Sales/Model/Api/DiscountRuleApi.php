@@ -59,9 +59,9 @@ class DiscountRuleApi implements DiscountRuleApiInterface
      */
     public function __construct(
         RuleRepositoryInterface $ruleRepository,
-        FBEHelper $fbeHelper,
-        OrderHelper $orderHelper,
-        Authenticator $authenticator
+        FBEHelper               $fbeHelper,
+        OrderHelper             $orderHelper,
+        Authenticator           $authenticator
     ) {
         $this->ruleRepository = $ruleRepository;
         $this->fbeHelper = $fbeHelper;
@@ -83,15 +83,21 @@ class DiscountRuleApi implements DiscountRuleApiInterface
         $storeId = $this->orderHelper->getStoreIdByExternalBusinessId($externalBusinessId);
         try {
             if (empty($rule->getWebsiteIds())) {
-                $rule->setWebsiteIds([
-                    $this->orderHelper->getWebsiteIdFromStoreId((int)$storeId)
-                ]);
+                $rule->setWebsiteIds(
+                    [
+                        $this->orderHelper->getWebsiteIdFromStoreId((int)$storeId)
+                    ]
+                );
             }
             if (empty($rule->getCustomerGroupIds())) {
                 $rule->setCustomerGroupIds(
                     [0] // By default, the ID for logged out customers.
                 );
             }
+            if ($rule->getFromDate() === null) {
+                $rule->setFromDate(date('Y-m-d'));
+            }
+
             $savedRule = $this->ruleRepository->save($rule);
             return (string)$savedRule->getRuleId();
         } catch (\Exception $e) {

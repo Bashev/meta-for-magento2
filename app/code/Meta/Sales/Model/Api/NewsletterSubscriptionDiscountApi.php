@@ -32,6 +32,7 @@ use Meta\BusinessExtension\Model\Api\CustomApiKey\Authenticator;
 
 /**
  * API class for managing newsletter subscription discount coupons.
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class NewsletterSubscriptionDiscountApi implements NewsletterSubscriptionDiscountApiInterface
 {
@@ -82,13 +83,13 @@ class NewsletterSubscriptionDiscountApi implements NewsletterSubscriptionDiscoun
      * @param Authenticator $authenticator Authenticator for API requests.
      */
     public function __construct(
-        SubscriberFactory $subscriberFactory,
-        RuleFactory $ruleFactory,
-        OrderHelper $orderHelper,
-        FBEHelper $fbeHelper,
-        MassgeneratorFactory $massGeneratorFactory,
+        SubscriberFactory                    $subscriberFactory,
+        RuleFactory                          $ruleFactory,
+        OrderHelper                          $orderHelper,
+        FBEHelper                            $fbeHelper,
+        MassgeneratorFactory                 $massGeneratorFactory,
         NewsletterSubscriptionDiscountStatus $newsletterSubscriptionDiscountStatus,
-        Authenticator $authenticator
+        Authenticator                        $authenticator
     ) {
         $this->subscriberFactory = $subscriberFactory;
         $this->ruleFactory = $ruleFactory;
@@ -112,12 +113,14 @@ class NewsletterSubscriptionDiscountApi implements NewsletterSubscriptionDiscoun
     {
         $this->authenticator->authenticateRequest();
 
+        $storeId = null;
         try {
             $storeId = (int)$this->orderHelper->getStoreIdByExternalBusinessId($externalBusinessId);
             if ($this->newsletterSubscriptionDiscountStatus->checkSubscriptionStatus(
                 $externalBusinessId,
                 $email
-            )) {
+            )
+            ) {
                 throw new LocalizedException(__('The buyer is already subscribed to the newsletter.'));
             }
             $rule = $this->ruleFactory->create()->load($ruleId);
@@ -160,6 +163,10 @@ class NewsletterSubscriptionDiscountApi implements NewsletterSubscriptionDiscoun
     private function generateCoupon(int $ruleId): CouponInterface
     {
         $rule = $this->ruleFactory->create()->load($ruleId);
+        if (!$rule->getId()) {
+            throw new LocalizedException(__('The specified discount rule does not exist.'));
+        }
+
         $generator = $this->massGeneratorFactory->create();
         $generator->setFormat(\Magento\SalesRule\Helper\Coupon::COUPON_FORMAT_ALPHANUMERIC);
         $generator->setRuleId($ruleId);
@@ -168,8 +175,15 @@ class NewsletterSubscriptionDiscountApi implements NewsletterSubscriptionDiscoun
         $generator->setLength(9);
         $generator->setPrefix('META_SUBSCRIBER_');
         $generator->setSuffix('');
-        $rule->setCouponCodeGenerator($generator);
-        $rule->setCouponType(\Magento\SalesRule\Model\Rule::COUPON_TYPE_AUTO);
-        return $rule->acquireCoupon();
+        $generator->setQty(1);
+
+        $generator->generatePool();
+        $coupons = $generator->getGeneratedCodes();
+
+        if (empty($coupons)) {
+            throw new LocalizedException(__('Failed to generate coupon code.'));
+        }
+
+        return $coupons[0];
     }
 }

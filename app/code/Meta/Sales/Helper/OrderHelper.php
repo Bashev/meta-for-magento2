@@ -79,7 +79,9 @@ class OrderHelper
      */
     public function loadFacebookOrderFromMagentoId($magentoOrderId): FacebookOrderInterface
     {
-        /** @var FacebookOrderInterface $facebookOrder */
+        /**
+         * @var FacebookOrderInterface $facebookOrder
+         */
         $facebookOrder = $this->facebookOrderFactory->create();
         $facebookOrder->load($magentoOrderId, 'magento_order_id');
 
@@ -120,7 +122,7 @@ class OrderHelper
     /**
      * Get storeId from externalBusinessId
      *
-     * @param  string $externalBusinessId
+     * @param string $externalBusinessId
      * @return string
      * @throws LocalizedException
      */
@@ -128,9 +130,11 @@ class OrderHelper
     {
         $installedConfigs = $this->getMBEInstalledConfigsByExternalBusinessId($externalBusinessId);
         if (empty($installedConfigs)) {
-            throw new LocalizedException(__(
-                'No store id was found for external_business_id: '.$externalBusinessId
-            ));
+            throw new LocalizedException(
+                __(
+                    'No store id was found for external_business_id: ' . $externalBusinessId
+                )
+            );
         }
         return $installedConfigs[0]->getScopeId();
     }

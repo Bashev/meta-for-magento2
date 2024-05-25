@@ -163,7 +163,7 @@ class Config
      *
      * @var string|null
      */
-    private ?string $version = '1.3.1-dev';
+    private ?string $version = '1.3.2-dev';
 
     /**
      * @method                                       __construct
@@ -344,12 +344,11 @@ class Config
     /**
      * Get store id
      *
-     * @return int
-     * @throws NoSuchEntityException
+     * @return null|int
      */
-    public function getStoreId()
+    public function getDefaultStoreId(): ?int
     {
-        return $this->storeManager->getStore()->getId();
+        return $this->castStoreIdAsInt($this->storeManager->getDefaultStoreView()?->getId());
     }
 
     /**
@@ -492,12 +491,17 @@ class Config
     public function getConfig($configPath, $scopeId = null, $scope = null)
     {
         if (!$scope && $this->isSingleStoreMode()) {
-            return $this->scopeConfig->getValue($configPath);
+            $singleStoreResult = $this->scopeConfig->getValue($configPath);
+            if ($singleStoreResult !== null) {
+                return $singleStoreResult;
+            }
         }
         try {
             $value = $this->scopeConfig->getValue(
-                $configPath, $scope ?: ScopeInterface::SCOPE_STORE, $scopeId === null
-                ? $this->storeManager->getStore()->getId() : $scopeId
+                $configPath,
+                $scope ?: ScopeInterface::SCOPE_STORE,
+                $scopeId === null
+                    ? $this->storeManager->getStore()->getId() : $scopeId
             );
         } catch (NoSuchEntityException $e) {
             return null;
@@ -598,7 +602,7 @@ class Config
      * Get external business id
      *
      * @param  int $scopeId
-     * @param  int $scope
+     * @param  string $scope
      * @return mixed
      */
     public function getExternalBusinessId($scopeId = null, $scope = null)
@@ -838,7 +842,8 @@ class Config
     {
         $stores = $this->storeManager->getStores();
         return array_filter(
-            $stores, function ($store) {
+            $stores,
+            function ($store) {
                 $scopeId = $store->getId();
                 return $this->isPostOnboardingState($scopeId);
             }
@@ -852,7 +857,8 @@ class Config
     {
         $stores = $this->storeManager->getStores();
         return array_filter(
-            $stores, function ($store) {
+            $stores,
+            function ($store) {
                 $scopeId = $store->getId();
                 return $this->isPostOnboardingState($scopeId) &&
                 $this->isActiveExtension($scopeId) &&
@@ -1109,5 +1115,20 @@ class Config
             $storeId
         );
         $this->cleanCache();
+    }
+
+    /**
+     * Cast Store id from ?string to ?int
+     *
+     * @param string|int|null $storeIdString
+     * @return int|null
+     */
+    public function castStoreIdAsInt(string|int|null $storeIdString): ?int
+    {
+        if (is_numeric($storeIdString)) {
+            return (int) $storeIdString;
+        } else {
+            return null;
+        }
     }
 }

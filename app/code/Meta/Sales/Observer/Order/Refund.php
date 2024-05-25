@@ -128,9 +128,13 @@ class Refund implements ObserverInterface
      */
     protected function executeImpl(Observer $observer)
     {
-        /** @var Payment $payment */
+        /**
+         * @var Payment $payment
+         */
         $payment = $observer->getEvent()->getPayment();
-        /** @var CreditmemoInterface $creditmemo */
+        /**
+         * @var CreditmemoInterface $creditmemo
+         */
         $creditmemo = $observer->getEvent()->getCreditmemo();
         $comments = $creditmemo->getComments();
 
@@ -146,7 +150,8 @@ class Refund implements ObserverInterface
         $storeId = $payment->getOrder()->getStoreId();
 
         if (!($this->systemConfig->isOrderSyncEnabled($storeId)
-            && $this->systemConfig->isActiveExtension($storeId))) {
+            && $this->systemConfig->isActiveExtension($storeId))
+        ) {
             return;
         }
 
@@ -248,11 +253,13 @@ class Refund implements ObserverInterface
         } catch (GuzzleException $e) {
             $response = $e->getResponse();
             $body = json_decode((string)$response->getBody());
-            throw new LocalizedException(__(
-                'Error code: "%1"; Error message: "%2"',
-                (string)$body->error->code,
-                (string)($body->error->error_user_msg ?? $body->error->message)
-            ));
+            throw new LocalizedException(
+                __(
+                    'Error code: "%1"; Error message: "%2"',
+                    (string)$body->error->code,
+                    (string)($body->error->error_user_msg ?? $body->error->message)
+                )
+            );
         }
     }
 

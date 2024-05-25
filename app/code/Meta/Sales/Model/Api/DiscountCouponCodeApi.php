@@ -54,9 +54,9 @@ class DiscountCouponCodeApi implements DiscountCouponCodeApiInterface
      * @param Authenticator $authenticator
      */
     public function __construct(
-        RuleFactory $ruleFactory,
+        RuleFactory          $ruleFactory,
         MassgeneratorFactory $massGeneratorFactory,
-        Authenticator $authenticator
+        Authenticator        $authenticator
     ) {
         $this->ruleFactory = $ruleFactory;
         $this->massGeneratorFactory = $massGeneratorFactory;
@@ -73,7 +73,7 @@ class DiscountCouponCodeApi implements DiscountCouponCodeApiInterface
     public function generateCouponCode(int $ruleId): string
     {
         $this->authenticator->authenticateRequest();
-        
+
         $rule = $this->ruleFactory->create()->load($ruleId);
         if (!$rule->getId()) {
             throw new LocalizedException(__('The specified discount rule does not exist.'));
@@ -87,14 +87,15 @@ class DiscountCouponCodeApi implements DiscountCouponCodeApiInterface
         $generator->setLength(9);
         $generator->setPrefix('META_');
         $generator->setSuffix('');
-        $rule->setCouponCodeGenerator($generator);
-        $rule->setCouponType(\Magento\SalesRule\Model\Rule::COUPON_TYPE_AUTO);
+        $generator->setQty(1);
 
-        $coupon = $rule->acquireCoupon();
-        if (!$coupon->getCode()) {
+        $generator->generatePool();
+        $coupons = $generator->getGeneratedCodes();
+
+        if (empty($coupons)) {
             throw new LocalizedException(__('Failed to generate coupon code.'));
         }
 
-        return $coupon->getCode();
+        return $coupons[0];
     }
 }

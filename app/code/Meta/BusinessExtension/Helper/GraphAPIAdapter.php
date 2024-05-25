@@ -575,7 +575,9 @@ class GraphAPIAdapter
     public function graphAPIBatchRequest(array $requests)
     {
         $response = $this->callApi(
-            'POST', '', [
+            'POST',
+            '',
+            [
             'access_token' => $this->accessToken,
             'batch' => json_encode($requests)
             ]
@@ -617,7 +619,7 @@ class GraphAPIAdapter
     {
         $requestFields = [
             'id',
-            'buyer_details',
+            'buyer_details{name, email, email_remarketing_option, phone_number}',
             'channel',
             'created',
             'estimated_payment_details',

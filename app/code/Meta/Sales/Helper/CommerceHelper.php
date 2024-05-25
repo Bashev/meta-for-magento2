@@ -145,7 +145,9 @@ class CommerceHelper
      */
     private function getFacebookOrder(string $facebookOrderId): FacebookOrderInterface
     {
-        /** @var FacebookOrderInterface $facebookOrder */
+        /**
+         * @var FacebookOrderInterface $facebookOrder
+         */
         $facebookOrder = $this->facebookOrderFactory->create();
         $facebookOrder->load($facebookOrderId, 'facebook_order_id');
 
@@ -278,11 +280,13 @@ class CommerceHelper
         } catch (GuzzleException $e) {
             $response = $e->getResponse();
             $body = json_decode((string)$response->getBody());
-            throw new LocalizedException(__(
-                'Error code: "%1"; Error message: "%2"',
-                (string)$body->error->code,
-                (string)($body->error->error_user_msg ?? $body->error->message)
-            ));
+            throw new LocalizedException(
+                __(
+                    'Error code: "%1"; Error message: "%2"',
+                    (string)$body->error->code,
+                    (string)($body->error->error_user_msg ?? $body->error->message)
+                )
+            );
         }
     }
 
