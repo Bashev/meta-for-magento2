@@ -55,7 +55,7 @@ class GraphAPIAdapter
     /**
      * @var string
      */
-    private $graphAPIVersion = 'v18.0';
+    private $graphAPIVersion = 'v20.0';
 
     /**
      * @var Client
@@ -1024,7 +1024,7 @@ class GraphAPIAdapter
     public function persistLogToMeta($context, $accessToken = null)
     {
         $request = [
-            'access_token' => $accessToken ?? $this->accessToken,
+            'access_token' => $accessToken ?? $this->clientAccessToken,
             'event' => $this->getContextData($context, 'event'),
             'event_type' => $this->getContextData($context, 'event_type'),
             'commerce_merchant_settings_id' => $this->getContextData($context, 'commerce_merchant_settings_id'),

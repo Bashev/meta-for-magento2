@@ -18,19 +18,27 @@ declare(strict_types=1);
  * limitations under the License.
  */
 
-namespace Meta\Sales\Api;
+namespace Meta\Conversion\Model\Tracker;
 
-interface NewsletterSubscriptionDiscountApiInterface
+use Meta\Conversion\Api\TrackerInterface;
+
+class PageView implements TrackerInterface
 {
+    private const EVENT_TYPE = 'PageView';
+
     /**
-     * Add an email to the newsletter subscription list
-     *
-     * If valid, returns an opt-in coupon.
-     *
-     * @param string $externalBusinessId
-     * @param string $email
-     * @param int $ruleId
-     * @return string
+     * @inheritDoc
      */
-    public function subscribeForCoupon(string $externalBusinessId, string $email, int $ruleId): string;
+    public function getEventType(): string
+    {
+        return self::EVENT_TYPE;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPayload(array $params): array
+    {
+        return [];
+    }
 }
